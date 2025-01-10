@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Configuration for NuGet packages
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    target-branch: "main"  # Change this to your main development branch
+    labels:
+      - "dependencies"
+      - "nuget"
+    commit-message:
+      prefix: "fix(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Group all dependencies together
+    groups:
+      nuget-dependencies:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: "all"
+
+  # Configuration for GitHub Actions (if you use them)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
