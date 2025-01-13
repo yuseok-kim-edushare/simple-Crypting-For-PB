@@ -1,17 +1,19 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using BCrypt.Net;
 
 namespace SecureLibrary
 {
     public class EncryptionHelper
     {
+        // this section for Symmetric Encryption with AES GCM mode
         public static byte[] EncryptAesGcm(string plainText, byte[] key, byte[] nonce)
         {
             using (AesGcm aesGcm = new AesGcm(key))
             {
                 byte[] encryptedData = new byte[plainText.Length];
-                byte[] tag = new byte[16]; // 128-bit tag
+                byte[] tag = new byte[32]; // 256-bit tag
                 aesGcm.Encrypt(nonce, Encoding.UTF8.GetBytes(plainText), encryptedData, tag);
                 return Combine(encryptedData, tag);
             }
@@ -21,8 +23,8 @@ namespace SecureLibrary
         {
             using (AesGcm aesGcm = new AesGcm(key))
             {
-                byte[] tag = new byte[16];
-                byte[] encryptedData = new byte[cipherText.Length - 16];
+                byte[] tag = new byte[32];
+                byte[] encryptedData = new byte[cipherText.Length - 32];
                 Array.Copy(cipherText, encryptedData, encryptedData.Length);
                 Array.Copy(cipherText, encryptedData.Length, tag, 0, tag.Length);
 
@@ -33,6 +35,7 @@ namespace SecureLibrary
             }
         }
 
+        // this section related about diffie hellman
         public static (byte[] publicKey, byte[] privateKey) GenerateDiffieHellmanKeys()
         {
             using (ECDiffieHellmanCng dh = new ECDiffieHellmanCng())
@@ -56,6 +59,7 @@ namespace SecureLibrary
             }
         }
 
+        // this is common byte combine method for AES and DH implementation
         private static byte[] Combine(byte[] first, byte[] second)
         {
             byte[] combined = new byte[first.Length + second.Length];
@@ -63,5 +67,12 @@ namespace SecureLibrary
             Array.Copy(second, 0, combined, first.Length, second.Length);
             return combined;
         }
+
+        // this section related about bcrypt
+        public static string BcryptEncoding(String password)
+        {string hashedPassword = BCrypt.Net.BCrypt.HashPassword(
+            password, 
+            BCrypt.Net.BCrypt.GenerateSalt(12)
+        );
     }
 }
