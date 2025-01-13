@@ -11,6 +11,9 @@ For Example
   - This is important to secure using Symmetric Encrypting Function in morden
 - Diffie Hellman Key Exchange or else equivalent
   - for 2nd layer securing to transport sensitive data
+- Bcrypt Password encoding or and so on to PW encryption
+  - this is the matter of one-way password encryption well
+  - just using 1 pass of hash function, eg. SHA-512 isn't secure enough
 
 ## Informations
 - Target Frameworks
