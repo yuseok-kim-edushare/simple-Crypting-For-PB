@@ -72,9 +72,12 @@
     <None Include="LICENSE" />
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include=".github\dependabot.yaml" />
+    <None Include=".github\workflows\ci.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".github\" />
+    <Folder Include=".github\workflows" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
