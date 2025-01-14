@@ -1,0 +1,26 @@
+﻿name: CI tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Restore dependencies
+      run: nuget restore
+
+    - name: Build solution
+      run: msbuild "simple-.net-Crypting-For-PowerBuilder.sln"" /p:Configuration=Release
+
+    # - name: Run tests
+    #   run: |
+    #     msbuild YourTestProject.csproj /t:Build /p:Configuration=Release
+    #     vstest.console.exe YourTestProject\bin\Release\YourTestProject.dll --logger:trx
