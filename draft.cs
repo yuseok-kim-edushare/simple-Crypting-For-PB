@@ -39,21 +39,30 @@ namespace SecureLibrary
         //        return Encoding.UTF8.GetString(decryptedData);
         //    }
         //}
+        // Symmetric Encryption with AES CBC mode
         public static (byte[] cipherText, byte[] iv) EncryptAesCbcWithIv(string plainText, byte[] key)
         {
             using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
-                aes.GenerateIV(); // IV »ý¼º
+                aes.GenerateIV(); // Generate IV
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
 
-                using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+                byte[] cipherText;
+
+                using (var memoryStream = new System.IO.MemoryStream())
                 {
-                    byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-                    byte[] cipherText = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
-                    return (cipherText, aes.IV);
+                    using (var cryptoStream = new CryptoStream(memoryStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        cryptoStream.Write(plainBytes, 0, plainBytes.Length);
+                        cryptoStream.FlushFinalBlock();
+                        cipherText = memoryStream.ToArray();
+                    }
                 }
+
+                return (cipherText, aes.IV);
             }
         }
 
@@ -66,11 +75,20 @@ namespace SecureLibrary
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
 
-                using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
+                byte[] decryptedBytes;
+
+                using (var memoryStream = new System.IO.MemoryStream(cipherText))
                 {
-                    byte[] decryptedBytes = decryptor.TransformFinalBlock(cipherText, 0, cipherText.Length);
-                    return Encoding.UTF8.GetString(decryptedBytes);
+                    using (var cryptoStream = new CryptoStream(memoryStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
+                        using (var reader = new System.IO.StreamReader(cryptoStream, Encoding.UTF8))
+                        {
+                            decryptedBytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+                        }
+                    }
                 }
+
+                return Encoding.UTF8.GetString(decryptedBytes);
             }
         }
         // this section related about diffie hellman
