@@ -18,7 +18,7 @@ jobs:
       run: nuget restore
 
     - name: Build solution
-      run: msbuild "simple-.net-Crypting-For-PowerBuilder.sln"" /p:Configuration=Release
+      run: msbuild "simple-.net-Crypting-For-PowerBuilder.sln" /p:Configuration=Release
 
     # - name: Run tests
     #   run: |
