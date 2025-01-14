@@ -17,6 +17,9 @@ jobs:
     - name: Restore dependencies
       run: nuget restore
 
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    
     - name: Build solution
       run: msbuild "simple-.net-Crypting-For-PowerBuilder.sln" /p:Configuration=Release
 
