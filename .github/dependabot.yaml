@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: "daily"
       time: "09:00"
-      timezone: "UTC"
+      timezone: Asia/Seoul
     open-pull-requests-limit: 10
     target-branch: "main"  # Change this to your main development branch
     labels:
