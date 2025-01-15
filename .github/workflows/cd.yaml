@@ -45,6 +45,10 @@ jobs:
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
         Write-Output "Latest release version: $latest_release"
+        $versionParts = $latest_release.Split('.')
+        $versionParts[-1] = [int]$versionParts[-1] + 1
+        $newVersionString = $versionParts -join '.'
+        Write-Output "::set-output name=latest_release::$newVersionString"
     
     - name: create Release
       uses: softprops/action-gh-release@v2
