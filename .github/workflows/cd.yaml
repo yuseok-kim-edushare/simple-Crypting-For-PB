@@ -39,9 +39,17 @@ jobs:
 
     - name: release zip make
       run: Compress-Archive -Path "D:\a\simple-.net-Crypting-For-PowerBuilder\simple-.net-Crypting-For-PowerBuilder\bin\Release\*.dll" -DestinationPath "Release.NET 4.8.zip"
-
+    
+    - name: Get latest release version
+      id: get_latest_release
+      run: |
+          latest_release=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
+          echo "Latest release version: $latest_release"
+          echo "::set-output name=latest_release::$latest_release"
+    
     - name: create Release
       uses: softprops/action-gh-release@v2
       with:
         files:
           "Release.NET 4.8.zip"
+        tag_name: ${{ steps.get_latest_release.outputs.latest_release }}
