@@ -105,8 +105,8 @@ namespace SecureLibrary
                 aes.KeySize = 256;
                 aes.GenerateKey();
                 string base64key = Convert.ToBase64String(aes.Key);
+                return base64key;
             }
-            return base64key;
         }
 
         
