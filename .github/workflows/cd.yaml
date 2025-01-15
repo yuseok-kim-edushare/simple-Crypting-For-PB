@@ -1,0 +1,47 @@
+name: Continuous Deployment
+on:
+  workflow_run:
+    workflows: ["CI tests"]
+    types:
+      - completed
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  discussions: write
+
+jobs:
+  deploy:
+    # Only run if CI workflow was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: nuget restore
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Build solution
+      run: msbuild "simple-.net-Crypting-For-PowerBuilder.sln" /p:Configuration=Release
+
+    - name: release zip make
+      run: Compress-Archive -Path "D:\a\simple-.net-Crypting-For-PowerBuilder\simple-.net-Crypting-For-PowerBuilder\bin\Release\*.dll" -DestinationPath "Release.NET 4.8.zip"
+
+    - name: create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files:
+          "Release.NET 4.8.zip"
