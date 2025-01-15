@@ -40,7 +40,7 @@ namespace SecureLibrary
         //    }
         //}
         // Symmetric Encryption with AES CBC mode
-        public static (byte[] cipherText, byte[] iv) EncryptAesCbcWithIv(string plainText, byte[] key)
+        public static byte[][] EncryptAesCbcWithIv(string plainText, byte[] key)
         {
             using (Aes aes = Aes.Create())
             {
@@ -61,8 +61,8 @@ namespace SecureLibrary
                         cipherText = memoryStream.ToArray();
                     }
                 }
-
-                return (cipherText, aes.IV);
+                byte[] iv = aes.IV;
+                return new byte[][] { cipherText, iv };
             }
         }
 
@@ -92,7 +92,7 @@ namespace SecureLibrary
             }
         }
         // this section related about diffie hellman
-        public static (byte[] publicKey, byte[] privateKey) GenerateDiffieHellmanKeys()
+        public static byte[][] GenerateDiffieHellmanKeys()
         {
             using (ECDiffieHellmanCng dh = new ECDiffieHellmanCng())
             {
@@ -100,7 +100,7 @@ namespace SecureLibrary
                 dh.HashAlgorithm = CngAlgorithm.Sha256;
                 byte[] publicKey = dh.PublicKey.ToByteArray();
                 byte[] privateKey = dh.Key.Export(CngKeyBlobFormat.EccPrivateBlob);
-                return (publicKey, privateKey);
+                return new byte[][] { publicKey, privateKey };
             }
         }
 
