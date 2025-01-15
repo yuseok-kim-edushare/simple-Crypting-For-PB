@@ -40,8 +40,9 @@ namespace SecureLibrary
         //    }
         //}
         // Symmetric Encryption with AES CBC mode
-        public static byte[][] EncryptAesCbcWithIv(string plainText, byte[] key)
-        {
+        public static string[] EncryptAesCbcWithIv(string plainText, string base64Key)
+        {    
+            byte[] key = Convert.FromBase64String(base64Key); 
             using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
@@ -61,13 +62,18 @@ namespace SecureLibrary
                         cipherText = memoryStream.ToArray();
                     }
                 }
-                byte[] iv = aes.IV;
-                return new byte[][] { cipherText, iv };
+                string base64CipherText = Convert.ToBase64String(cipherText);
+                string base64IV = Convert.ToBase64String(aes.IV);
+                return new string[] { base64CipherText, base64IV };
             }
         }
 
-        public static string DecryptAesCbcWithIv(byte[] cipherText, byte[] key, byte[] iv)
+        public static string DecryptAesCbcWithIv(string base64CipherText, string base64Key, string base64IV)
         {
+            byte[] key = Convert.FromBase64String(base64Key);
+            byte[] cipherText = Convert.FromBase64String(base64CipherText);
+            byte[] iv = Convert.FromBase64String(base64IV);
+
             using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
@@ -91,6 +97,19 @@ namespace SecureLibrary
                 return Encoding.UTF8.GetString(decryptedBytes);
             }
         }
+
+        public static string KeyGenAES256()
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 256;
+                aes.GenerateKey();
+                string base64key = Convert.ToBase64String(aes.Key);
+                return base64key;
+            }
+        }
+
+        
         // this section related about diffie hellman
         public static byte[][] GenerateDiffieHellmanKeys()
         {
