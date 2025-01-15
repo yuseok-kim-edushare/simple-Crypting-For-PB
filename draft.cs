@@ -91,6 +91,19 @@ namespace SecureLibrary
                 return Encoding.UTF8.GetString(decryptedBytes);
             }
         }
+
+        public static string KeyGenAES256()
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 256;
+                aes.GenerateKey();
+                string base64key = ConvertToBase64String(aes.Key);
+            }
+            return base64key;
+        }
+
+        
         // this section related about diffie hellman
         public static byte[][] GenerateDiffieHellmanKeys()
         {
