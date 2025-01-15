@@ -43,9 +43,8 @@ jobs:
     - name: Get latest release version
       id: get_latest_release
       run: |
-          latest_release=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | jq -r .tag_name)
-          echo "Latest release version: $latest_release"
-          echo "::set-output name=latest_release::$latest_release"
+        $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
+        Write-Output "Latest release version: $latest_release"
     
     - name: create Release
       uses: softprops/action-gh-release@v2
