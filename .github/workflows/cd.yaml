@@ -45,18 +45,18 @@ jobs:
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
         Write-Output "Latest release version: $latest_release"
-        Write-Output "latest_release=$latest_release" >> $GITHUB_ENV
+        Write-Output "latest_release=$latest_release" >> $env:GITHUB_ENV
         $versionParts = $latest_release.Split('.')
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
-        Write-Output "new_release=$newVersionString" >> $GITHUB_ENV
+        Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
     
     - name: Generate release notes
       id: generate_release_notes
       run: |
         $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
         $releaseNotes += (git log ${{ env.latest_release }}..HEAD --oneline)
-        Write-Output "release_notes=$releaseNotes" >> $GITHUB_ENV
+        Write-Output "release_notes=$releaseNotes" >> $env:GITHUB_ENV
   
     
     - name: Create Release
