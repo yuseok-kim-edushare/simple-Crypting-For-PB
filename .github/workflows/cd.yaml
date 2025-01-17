@@ -45,23 +45,24 @@ jobs:
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
         Write-Output "Latest release version: $latest_release"
+        Write-Output "latest_release=$latest_release" >> $GITHUB_ENV
         $versionParts = $latest_release.Split('.')
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
-        echo "latest_release=$newVersionString" >> $GITHUB_ENV
+        Write-Output "new_release=$newVersionString" >> $GITHUB_ENV
     
     - name: Generate release notes
       id: generate_release_notes
       run: |
         $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
         $releaseNotes += (git log ${{ env.latest_release }}..HEAD --oneline)
-        echo "release_notes=$releaseNotes" >> $GITHUB_ENV
+        Write-Output "release_notes=$releaseNotes" >> $GITHUB_ENV
   
     
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: "Release.NET 4.8.zip"
-        tag_name: ${{ env.latest_release }}
-        name: ${{ env.latest_release }}
+        tag_name: ${{ env.new_release }}
+        name: ${{ env.new_release }}
         body: ${{ env.release_Notes }}
