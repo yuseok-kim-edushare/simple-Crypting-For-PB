@@ -19,6 +19,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-tags: true
+        fetch-depth: 0
 
     - name: Cache NuGet packages
       uses: actions/cache@v4
@@ -40,18 +43,24 @@ jobs:
     - name: release zip make
       run: Compress-Archive -Path "D:\a\simple-.net-Crypting-For-PowerBuilder\simple-.net-Crypting-For-PowerBuilder\bin\Release\*.dll" -DestinationPath "Release.NET 4.8.zip"
     
-    - name: Get latest release version
+    - name: Get latest release version and Generate release notes
       id: get_latest_release
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
         Write-Output "Latest release version: $latest_release"
-        Write-Output "latest_release=$latest_release" >> $env:GITHUB_ENV
+        echo "latest_release=$latest_release" >> $env:GITHUB_ENV
         $versionParts = $latest_release.Split('.')
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
-        Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
-    
-
+        echo "new_release=$newVersionString" >> $env:GITHUB_ENV
+        $releaseNotes = "## Changes in " + $latest_release + "`n"
+        $releaseNotes += (git log HEAD ^$latest_release --oneline) -join "`n"
+        $releaseNotes += (git diff HEAD ^$latest_release --compact-summary) -join "`n"
+        $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
+        $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
+        echo "release_notes<<EOF" >> $env:GITHUB_ENV
+        echo "$releaseNotesContent" >> $env:GITHUB_ENV
+        echo "EOF" >> $env:GITHUB_ENV
   
     - name: Create Release
       uses: softprops/action-gh-release@v2
@@ -59,4 +68,4 @@ jobs:
         files: "Release.NET 4.8.zip"
         tag_name: ${{ env.new_release }}
         name: ${{ env.new_release }}
-
+        body: ${{ env.release_notes }}
