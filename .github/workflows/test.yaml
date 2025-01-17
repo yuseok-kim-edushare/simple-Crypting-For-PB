@@ -10,7 +10,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Get latest release version
+    - name: Get latest release version and Generate release notes
       id: get_latest_release
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
@@ -20,13 +20,9 @@ jobs:
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
         Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
-    
-    - name: Generate release notes
-      id: generate_release_notes
-      run: |
-        $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
-        $releaseNotes += (git log HEAD ^${{ env.latest_release }} --oneline)
-        $releaseNotes += (git diff HEAD ^${{ env.latest_release }} --compact-summary)
+        $releaseNotes = "## Changes in " + $latest_release + "`n"
+        $releaseNotes += (git log HEAD ^$latest_release --oneline)
+        $releaseNotes += (git diff HEAD ^$latest_release --compact-summary)
         $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
         $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
         Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
