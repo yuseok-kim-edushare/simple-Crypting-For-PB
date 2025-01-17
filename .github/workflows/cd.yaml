@@ -48,11 +48,20 @@ jobs:
         $versionParts = $latest_release.Split('.')
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
-        Write-Output "::set-output name=latest_release::$newVersionString"
+        echo "latest_release=$newVersionString" >> $GITHUB_ENV
     
-    - name: create Release
+    - name: Generate release notes
+      id: generate_release_notes
+      run: |
+        $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
+        $releaseNotes += (git log ${{ env.latest_release }}..HEAD --oneline)
+        echo "release_notes=$releaseNotes" >> $GITHUB_ENV
+  
+    
+    - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files:
-          "Release.NET 4.8.zip"
-        tag_name: ${{ steps.get_latest_release.outputs.latest_release }}
+        files: "Release.NET 4.8.zip"
+        tag_name: ${{ env.latest_release }}
+        name: ${{ env.latest_release }}
+        body: ${{ env.release_Notes }}
