@@ -55,10 +55,11 @@ jobs:
       id: generate_release_notes
       run: |
         $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
-        $releaseNotes += (git log ${{ env.latest_release }}..head --oneline)
-        Write-Output "release_notes=$releaseNotes" >> $env:GITHUB_ENV
+        $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
+        git log ${{ env.latest_release }}..HEAD --oneline >> releaseNotes.txt
+        $releaseNotesContent = Get-Content -Path release_notes.txt -Raw
+        Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
   
-    
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
