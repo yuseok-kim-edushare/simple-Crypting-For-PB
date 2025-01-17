@@ -132,7 +132,7 @@ namespace SecureLibrary
         // this section related about bcrypt
         public static string BcryptEncoding(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt(11));
+            return BCrypt.Net.BCrypt.HashPassword(password, 10);
         }
         public static bool VerifyBcryptPassword(string password, string hashedPassword)
         {
