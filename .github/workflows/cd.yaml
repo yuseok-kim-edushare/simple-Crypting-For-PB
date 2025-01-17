@@ -19,6 +19,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-tags: true
 
     - name: Cache NuGet packages
       uses: actions/cache@v4
@@ -40,7 +42,7 @@ jobs:
     - name: release zip make
       run: Compress-Archive -Path "D:\a\simple-.net-Crypting-For-PowerBuilder\simple-.net-Crypting-For-PowerBuilder\bin\Release\*.dll" -DestinationPath "Release.NET 4.8.zip"
     
-    - name: Get latest release version
+    - name: Get latest release version and Generate release notes
       id: get_latest_release
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
@@ -50,8 +52,13 @@ jobs:
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
         Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
-    
-
+        $releaseNotes = "## Changes in " + $latest_release + "`n"
+        $releaseNotes += (git log HEAD ^$latest_release --oneline)
+        $releaseNotes += (git diff HEAD ^$latest_release --compact-summary)
+        $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
+        $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
+        Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
+        Write-Output $releaseNotesContent
   
     - name: Create Release
       uses: softprops/action-gh-release@v2
