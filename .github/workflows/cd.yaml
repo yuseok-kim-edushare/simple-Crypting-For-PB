@@ -55,7 +55,7 @@ jobs:
       id: generate_release_notes
       run: |
         $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
-        $releaseNotes += (git log ${{ env.latest_release }}..HEAD --oneline)
+        $releaseNotes += (git log "${{ env.latest_release }}"..HEAD --oneline)
         Write-Output "release_notes=$releaseNotes" >> $env:GITHUB_ENV
   
     
