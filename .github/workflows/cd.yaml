@@ -51,7 +51,15 @@ jobs:
         $newVersionString = $versionParts -join '.'
         Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
     
-
+    - name: Generate release notes
+      id: generate_release_notes
+      run: |
+        $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
+        $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
+        git log HEAD ^${{ env.latest_release }} --oneline >> releaseNotes.txt
+        git diff HEAD ^${{ env.latest_release }} --compact-summary
+        $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
+        Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
   
     - name: Create Release
       uses: softprops/action-gh-release@v2
@@ -59,4 +67,4 @@ jobs:
         files: "Release.NET 4.8.zip"
         tag_name: ${{ env.new_release }}
         name: ${{ env.new_release }}
-
+        body: ${{ env.release_Notes }}
