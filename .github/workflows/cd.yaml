@@ -21,6 +21,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-tags: true
+        fetch-depth: 0
 
     - name: Cache NuGet packages
       uses: actions/cache@v4
@@ -42,6 +43,9 @@ jobs:
     - name: release zip make
       run: Compress-Archive -Path "D:\a\simple-.net-Crypting-For-PowerBuilder\simple-.net-Crypting-For-PowerBuilder\bin\Release\*.dll" -DestinationPath "Release.NET 4.8.zip"
     
+    - name: Set up Git configuration
+      run: |
+        git fetch --tags -f  # Force fetch all tags
     - name: Get latest release version and Generate release notes
       id: get_latest_release
       run: |
