@@ -1,0 +1,34 @@
+﻿name: Test auto gen rel.notes
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get latest release version
+      id: get_latest_release
+      run: |
+        $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
+        Write-Output "Latest release version: $latest_release"
+        Write-Output "latest_release=$latest_release" >> $env:GITHUB_ENV
+        $versionParts = $latest_release.Split('.')
+        $versionParts[-1] = [int]$versionParts[-1] + 1
+        $newVersionString = $versionParts -join '.'
+        Write-Output "new_release=$newVersionString" >> $env:GITHUB_ENV
+    
+    - name: Generate release notes
+      id: generate_release_notes
+      run: |
+        $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
+	$releaseNotes += (git log HEAD ^${{ env.latest_release }} --oneline)
+        $releaseNotes += (git diff HEAD ^${{ env.latest_release }} --compact-summary)
+        $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
+	$releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
+        Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
+        Write-Output $releaseNotesContent
+ 
