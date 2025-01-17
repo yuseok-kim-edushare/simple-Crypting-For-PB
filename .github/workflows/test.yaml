@@ -25,10 +25,10 @@ jobs:
       id: generate_release_notes
       run: |
         $releaseNotes = "## Changes in ${{ env.latest_release }}" + "`n"
-	$releaseNotes += (git log HEAD ^${{ env.latest_release }} --oneline)
+        $releaseNotes += (git log HEAD ^${{ env.latest_release }} --oneline)
         $releaseNotes += (git diff HEAD ^${{ env.latest_release }} --compact-summary)
         $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
-	$releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
+        $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
         Write-Output "release_notes=$releaseNotesContent" >> $env:GITHUB_ENV
         Write-Output $releaseNotesContent
  
