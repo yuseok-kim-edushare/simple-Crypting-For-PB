@@ -9,11 +9,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-tags: true
+        fetch-depth: 0
 
     - name: test
       run: |
         $test = git tag
         Write-Output $test
+
+    - name: Set up Git configuration
+      run: |
+        git fetch --tags -f  # Force fetch all tags
 
     - name: Get latest release version and Generate release notes
       id: get_latest_release
