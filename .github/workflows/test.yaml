@@ -18,23 +18,19 @@ jobs:
       run: |
         $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest").tag_name
         echo "Latest release version: $latest_release"
-        echo "latest_release=$latest_release" >> $GITHUB_ENV
+        echo "latest_release=$latest_release" >> $env:GITHUB_ENV
         $versionParts = $latest_release.Split('.')
         $versionParts[-1] = [int]$versionParts[-1] + 1
         $newVersionString = $versionParts -join '.'
-        echo "new_release=$newVersionString" >> $GITHUB_ENV
+        echo "new_release=$newVersionString" >> $env:GITHUB_ENV
         $releaseNotes = "## Changes in " + $latest_release + "`n"
         $releaseNotes += (git log HEAD ^$latest_release --oneline)
         $releaseNotes += (git diff HEAD ^$latest_release --compact-summary)
         $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
         $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
-        echo "release_notes<<EOF" >> $GITHUB_ENV
-        echo "$releaseNotesContent" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      env:
-        latest_release: ${{ env.latest_release }}
-        new_release: ${{ env.new_release }}
-        release_notes: ${{ env.release_notes }}
+        echo "release_notes<<EOF" >> $env:GITHUB_ENV
+        echo "$releaseNotesContent" >> $env:GITHUB_ENV
+        echo "EOF" >> $env:GITHUB_ENV
 
     - name: Use the outputs in another step
       run: |
