@@ -13,15 +13,6 @@ jobs:
         fetch-tags: true
         fetch-depth: 0
 
-    - name: test
-      run: |
-        $test = git tag
-        Write-Output $test
-
-    - name: Set up Git configuration
-      run: |
-        git fetch --tags -f  # Force fetch all tags
-
     - name: Get latest release version and Generate release notes
       id: get_latest_release
       run: |
@@ -39,4 +30,9 @@ jobs:
         $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
         Write-Output "release_notes=$releaseNotesContent" >> $GITHUB_ENV
         Write-Output $releaseNotesContent
- 
+
+    - name: Test
+      id: test_latest_release
+      run: |
+        $release = ${{ env.release_notes }}
+        Write-Output $release
