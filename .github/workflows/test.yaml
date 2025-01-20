@@ -31,9 +31,12 @@ jobs:
         Write-Output "release_notes=$releaseNotesContent" >> $GITHUB_ENV
         Write-Output $releaseNotesContent
         Write-Output $GITHUB_ENV
+        Write-Output $release_notes
+
 
     - name: Test
       id: test_latest_release
       run: |
         $release = ${{ env.release_notes }}
         Write-Output $release
+        Write-Output $release_notes
