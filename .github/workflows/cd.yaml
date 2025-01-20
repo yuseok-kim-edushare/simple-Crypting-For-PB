@@ -55,7 +55,9 @@ jobs:
         echo "new_release=$newVersionString" >> $env:GITHUB_ENV
         $releaseNotes = "## Changes in " + $latest_release + "`n"
         $releaseNotes += (git log HEAD ^$latest_release --oneline) -join "`n"
-        $releaseNotes += (" ") -join "`n"
+        $releaseNotes += "`n"
+        $releaseNotes += "### File edited `n"
+        $releaseNotes += "`n"
         $releaseNotes += (git diff HEAD ^$latest_release --compact-summary) -join "`n"
         $releaseNotes | Out-File -FilePath releaseNotes.txt -Encoding utf8
         $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
