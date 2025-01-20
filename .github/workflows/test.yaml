@@ -30,6 +30,7 @@ jobs:
         $releaseNotesContent = Get-Content -Path releaseNotes.txt -Raw
         Write-Output "release_notes=$releaseNotesContent" >> $GITHUB_ENV
         Write-Output $releaseNotesContent
+        Write-Output $GITHUB_ENV
 
     - name: Test
       id: test_latest_release
