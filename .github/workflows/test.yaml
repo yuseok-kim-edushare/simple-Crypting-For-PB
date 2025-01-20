@@ -31,7 +31,7 @@ jobs:
         echo "release_notes<<EOF" >> $GITHUB_ENV
         echo "$releaseNotesContent" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-      outputs:
+      env:
         latest_release: ${{ env.latest_release }}
         new_release: ${{ env.new_release }}
         release_notes: ${{ env.release_notes }}
@@ -39,7 +39,7 @@ jobs:
     - name: Use the outputs in another step
       run: |
         echo "Using outputs from previous step"
-        echo "Latest release: ${{ steps.get_latest_release.outputs.latest_release }}"
-        echo "New release: ${{ steps.get_latest_release.outputs.new_release }}"
+        echo "Latest release: ${{ env.latest_release }}"
+        echo "New release: ${{ env.new_release }}"
         echo "Release notes:"
-        echo "${{ steps.get_latest_release.outputs.release_notes }}"
+        echo "${{ env.release_notes }}"
